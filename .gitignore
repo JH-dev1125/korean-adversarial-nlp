@@ -1,9 +1,6 @@
 .env
 *.key
 secrets.yaml
-data/raw/
-data/processed/
-data/augmented/
 *.csv
 *.jsonl
 *.tsv
