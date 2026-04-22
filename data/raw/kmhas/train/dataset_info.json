@@ -1,0 +1,75 @@
+{
+  "builder_name": "parquet",
+  "citation": "@inproceedings{lee-etal-2022-k,\n    title = \"K-{MH}a{S}: A Multi-label Hate Speech Detection Dataset in {K}orean Online News Comment\",\n    author = \"Lee, Jean  and\n      Lim, Taejun  and\n      Lee, Heejun  and\n      Jo, Bogeun  and\n      Kim, Yangsok  and\n      Yoon, Heegeun  and\n      Han, Soyeon Caren\",\n    booktitle = \"Proceedings of the 29th International Conference on Computational Linguistics\",\n    month = oct,\n    year = \"2022\",\n    address = \"Gyeongju, Republic of Korea\",\n    publisher = \"International Committee on Computational Linguistics\",\n    url = \"https://aclanthology.org/2022.coling-1.311\",\n    pages = \"3530--3538\",\n    abstract = \"Online hate speech detection has become an important issue due to the growth of online content, but resources in languages other than English are extremely limited. We introduce K-MHaS, a new multi-label dataset for hate speech detection that effectively handles Korean language patterns. The dataset consists of 109k utterances from news comments and provides a multi-label classification using 1 to 4 labels, and handles subjectivity and intersectionality. We evaluate strong baselines on K-MHaS. KR-BERT with a sub-character tokenizer outperforms others, recognizing decomposed characters in each hate speech class.\",\n}\n",
+  "config_name": "default",
+  "dataset_name": "kmhas_korean_hate_speech",
+  "dataset_size": 11029740,
+  "description": "The K-MHaS (Korean Multi-label Hate Speech) dataset contains 109k utterances from Korean online news comments labeled with 8 fine-grained hate speech classes or Not Hate Speech class.\nThe fine-grained hate speech classes are politics, origin, physical, age, gender, religion, race, and profanity and these categories are selected in order to reflect the social and historical context.\n",
+  "download_checksums": {
+    "hf://datasets/jeanlee/kmhas_korean_hate_speech@5df3b7429d68f0ffc89dfbd0159cc72f29fad63c/default/train/0000.parquet": {
+      "num_bytes": 5244851,
+      "checksum": null
+    },
+    "hf://datasets/jeanlee/kmhas_korean_hate_speech@5df3b7429d68f0ffc89dfbd0159cc72f29fad63c/default/validation/0000.parquet": {
+      "num_bytes": 578860,
+      "checksum": null
+    },
+    "hf://datasets/jeanlee/kmhas_korean_hate_speech@5df3b7429d68f0ffc89dfbd0159cc72f29fad63c/default/test/0000.parquet": {
+      "num_bytes": 1458266,
+      "checksum": null
+    }
+  },
+  "download_size": 7281977,
+  "features": {
+    "text": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "label": {
+      "feature": {
+        "names": [
+          "origin",
+          "physical",
+          "politics",
+          "profanity",
+          "age",
+          "gender",
+          "race",
+          "religion",
+          "not_hate_speech"
+        ],
+        "_type": "ClassLabel"
+      },
+      "_type": "Sequence"
+    }
+  },
+  "homepage": "https://github.com/adlnlp/K-MHaS",
+  "license": "cc-by-sa-4.0",
+  "size_in_bytes": 18311717,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 7949383,
+      "num_examples": 78977,
+      "dataset_name": "kmhas_korean_hate_speech"
+    },
+    "validation": {
+      "name": "validation",
+      "num_bytes": 871111,
+      "num_examples": 8776,
+      "dataset_name": "kmhas_korean_hate_speech"
+    },
+    "test": {
+      "name": "test",
+      "num_bytes": 2209246,
+      "num_examples": 21939,
+      "dataset_name": "kmhas_korean_hate_speech"
+    }
+  },
+  "version": {
+    "version_str": "1.0.0",
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  }
+}
