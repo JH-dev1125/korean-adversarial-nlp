@@ -1,0 +1,53 @@
+# ====================================================
+# configs/finetune.yaml
+# 소형 모델(BERT 계열) 학습 설정 파일
+#
+# 여기서 숫자를 바꾸면 학습 방식이 달라져!
+# 코드를 직접 수정하지 않아도 실험 조건 변경 가능.
+# ====================================================
+
+# ── 모델 설정 ────────────────────────────────────────
+model:
+  name: "klue/bert-base"        # 사용할 모델 이름 (Hugging Face 주소)
+  # 다른 선택지:
+  #   "klue/roberta-base"       ← KLUE-RoBERTa
+  #   "snunlp/KR-ELECTRA-discriminator"
+  #   "beomi/kcbert-base"       ← KCBERT
+  num_labels: 2                 # 분류 클래스 수 (0=정상, 1=혐오)
+  max_length: 128               # 입력 텍스트 최대 길이 (단어 수 기준)
+
+# ── 학습 설정 ────────────────────────────────────────
+training:
+  batch_size: 32                # 한 번에 처리할 샘플 수 (클수록 GPU 메모리 많이 씀)
+  epochs: 5                     # 전체 데이터를 몇 번 반복 학습할지
+  learning_rate: 2e-5           # 학습률 (너무 크면 학습이 불안정, 너무 작으면 느림)
+  warmup_ratio: 0.1             # 초반에 학습률을 서서히 올리는 비율
+  weight_decay: 0.01            # 과적합(overfitting) 방지 설정
+  seed: 42                      # 실험 재현을 위한 난수 고정값
+
+# ── 데이터 설정 ──────────────────────────────────────
+data:
+  dataset: "khaters"            # 사용할 데이터셋 ("khaters" 또는 "kold")
+  train_ratio: 0.8              # 학습:검증:테스트 = 80:10:10
+  val_ratio: 0.1
+  test_ratio: 0.1
+
+# ── 공격 설정 ────────────────────────────────────────
+attack:
+  types:                        # 평가할 공격 유형 목록
+    - jamo_split                # 자모 분리
+    - phoneme_sub               # 음소 치환
+    - visual_sub                # 시각적 유사 문자
+    - coda_manip                # 받침 탈락/삽입
+    - liaison                   # 연음 역이용
+    - spacing                   # 띄어쓰기 조작
+    - romanize                  # 로마자 혼용
+    - emoji_insert              # 이모지/특수문자
+    - combined                  # 복합 공격
+  intensities: [0.1, 0.2, 0.3] # 공격 강도 3단계
+
+# ── 저장 경로 ────────────────────────────────────────
+paths:
+  data_dir: "data/"
+  results_dir: "results/"
+  model_save_dir: "results/saved_models/"

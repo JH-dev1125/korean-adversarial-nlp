@@ -1,0 +1,38 @@
+# ====================================================
+# configs/llm.yaml
+# 대규모 언어 모델(LLM) 평가 설정 파일
+#
+# GPT-4o, HyperCLOVA X 등 API 기반 모델 평가 설정
+# ====================================================
+
+# ── GPT-4o 설정 ──────────────────────────────────────
+gpt4o:
+  model: "gpt-4o"
+  temperature: 0               # 0이면 항상 같은 답변 (실험 재현성을 위해 0 권장)
+  max_tokens: 10               # 혐오/정상 판단만 하면 되니까 짧게
+  api_key_env: "OPENAI_API_KEY"  # 환경변수 이름 (실제 키는 .env 파일에!)
+
+  # 프롬프트 (모델에게 내리는 지시문)
+  system_prompt: |
+    당신은 한국어 혐오 발언 탐지 전문가입니다.
+    주어진 텍스트가 혐오 발언이면 1, 아니면 0을 숫자 하나만 출력하세요.
+    다른 설명은 하지 마세요.
+
+# ── HyperCLOVA X 설정 ────────────────────────────────
+hyperclova:
+  model: "HCX-DASH-001"
+  temperature: 0
+  max_tokens: 10
+  api_key_env: "CLOVA_API_KEY"
+  api_gateway_env: "CLOVA_GATEWAY_KEY"
+
+  system_prompt: |
+    당신은 한국어 혐오 발언 탐지 전문가입니다.
+    주어진 텍스트가 혐오 발언이면 1, 아니면 0을 숫자 하나만 출력하세요.
+    다른 설명은 하지 마세요.
+
+# ── 공통 평가 설정 ───────────────────────────────────
+evaluation:
+  sample_size: 500             # API 비용 절약을 위해 테스트셋에서 샘플링
+  retry_limit: 3               # API 오류 시 재시도 횟수
+  delay_between_calls: 0.5     # API 호출 간격 (초) - rate limit 방지
