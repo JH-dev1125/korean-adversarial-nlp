@@ -1,7 +1,7 @@
 """
 src/attacks/run_all_attacks.py
 
-세 가지 공격을 강도별로 실행해 data/augmented/에 저장한다.
+9가지 공격을 강도별로 실행해 data/augmented/에 저장한다.
 
 실행 위치:
     프로젝트 최상위 폴더
@@ -9,13 +9,15 @@ src/attacks/run_all_attacks.py
 실행 명령:
     python src/attacks/run_all_attacks.py
 
-반복 개수 변경:
+반복 변형 개수 변경:
     NUM_VARIANTS 값을 바꾸면 된다.
-    예: 5이면 label=1은 5개 변형, label=0은 원문 그대로 5개 복사.
+    예: 5이면 label=1인 각 원문마다 같은 공격/강도에 대해 5개 변형 생성.
+    label=0인 정상 텍스트도 NUM_VARIANTS개 복사해서 개수 균형 맞춤.
 """
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -28,12 +30,17 @@ sys.path.append(str(PROJECT_ROOT))
 from src.attacks.phoneme_sub import PhonemeSubAttack
 from src.attacks.visual_sub import VisualSubAttack
 from src.attacks.romanize import RomanizeAttack
+from src.attacks.jamo_split import JamoSplitAttack
+from src.attacks.coda_manip import CodaManipAttack
+from src.attacks.liaison import LiaisonAttack
+from src.attacks.spacing import SpacingAttack
+from src.attacks.emoji_insert import EmojiInsertAttack
 
 INPUT_PATH = PROJECT_ROOT / "data" / "processed" / "test.csv"
 OUTPUT_DIR = PROJECT_ROOT / "data" / "augmented"
 
 INTENSITIES = [0.1, 0.2, 0.3]
-NUM_VARIANTS = 5  # 각 원문에 대해 생성/복사할 개수
+NUM_VARIANTS = 5  # 혐오/정상 모두 동일하게 5개 생성 (개수 균형)
 RANDOM_SEED = 42
 
 
@@ -47,12 +54,23 @@ def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     df = pd.read_csv(INPUT_PATH)
 
-    attack_classes = [PhonemeSubAttack, VisualSubAttack, RomanizeAttack]
+    # 9가지 공격 클래스 목록
+    attack_classes = [
+        PhonemeSubAttack,   # 음소 치환
+        VisualSubAttack,    # 시각적 유사 문자
+        RomanizeAttack,     # 로마자 혼용
+        JamoSplitAttack,    # 자모 분리
+        CodaManipAttack,    # 받침 탈락/삽입
+        LiaisonAttack,      # 연음 역이용
+        SpacingAttack,      # 띄어쓰기 조작
+        EmojiInsertAttack,  # 이모지/특수문자 삽입
+    ]
 
     print("=" * 60)
     print("공격 데이터 생성 시작")
     print(f"입력 파일: {INPUT_PATH}")
-    print(f"반복 개수: 모든 행마다 {NUM_VARIANTS}개(label=1 변형, label=0 복사)")
+    print(f"반복 변형 개수: {NUM_VARIANTS}개 (혐오/정상 동일)")
+    print(f"총 생성 파일 수: {len(attack_classes) * len(INTENSITIES)}개 (복합 공격 제외)")
     print("=" * 60)
 
     for attack_cls in attack_classes:
@@ -65,15 +83,17 @@ def main() -> None:
             attacked_df.to_csv(output_path, index=False, encoding="utf-8-sig")
 
             print(
-                f"저장 완료: {output_path} | "
+                f"저장 완료: test_{attack_type}_{intensity}.csv | "
                 f"총 {len(attacked_df)}행 | "
-                f"label=1 행 {(attacked_df['label'] == 1).sum()}개 | "
-                f"label=0 행 {(attacked_df['label'] == 0).sum()}개"
+                f"혐오 {(attacked_df['label'] == 1).sum()}개 | "
+                f"정상 {(attacked_df['label'] == 0).sum()}개"
             )
 
     print("=" * 60)
-    print("공격 데이터 생성 완료")
+    print("✅ 공격 데이터 생성 완료!")
+    print(f"저장 위치: {OUTPUT_DIR}")
     print("=" * 60)
+    print("\n⚠️  복합 공격(combined)은 별도로 구현 예정")
 
 
 if __name__ == "__main__":
