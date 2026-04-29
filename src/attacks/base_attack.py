@@ -4,9 +4,9 @@ src/attacks/base_attack.py
 모든 공격 클래스가 상속받는 공통 틀.
 
 핵심 원칙:
-- label=1인 혐오/공격 텍스트에만 변형 적용
-- label=0인 정상 텍스트는 원문 그대로 유지
-- 같은 원문에 대해 여러 번 무작위 변형을 생성할 수 있음
+- label=1인 혐오/공격 텍스트는 여러 번 무작위 변형
+- label=0인 정상 텍스트는 변형하지 않고 같은 개수만큼 복사
+- 모든 원문이 같은 num_variants 개수만큼 출력되어 라벨 비율 유지
 - 출력 컬럼:
   text, label, source, original_text, attack_type, intensity, variant_id
 """
@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import math
 import random
-from typing import Iterable, List, Sequence
+from typing import List, Sequence
 
 import pandas as pd
 
@@ -55,7 +55,7 @@ class BaseAttack:
 
         Args:
             df: text, label, source 컬럼을 가진 데이터프레임
-            num_variants: label=1인 각 행에 대해 생성할 변형 개수
+            num_variants: 각 원문에 대해 생성/복사할 개수
 
         Returns:
             text, label, source, original_text, attack_type, intensity, variant_id 컬럼을 가진 데이터프레임
@@ -76,7 +76,7 @@ class BaseAttack:
             source = row["source"]
 
             if label == 1:
-                # 같은 원문에 대해 여러 번 무작위 변형 생성
+                # 혐오 텍스트는 같은 원문에 대해 여러 번 무작위 변형 생성
                 seen = set()
                 for variant_id in range(1, num_variants + 1):
                     attacked_text = self.attack_text(original_text)
@@ -100,18 +100,19 @@ class BaseAttack:
                         }
                     )
             else:
-                # 정상 텍스트는 공격하지 않고 1개만 유지
-                rows.append(
-                    {
-                        "text": original_text,
-                        "label": label,
-                        "source": source,
-                        "original_text": original_text,
-                        "attack_type": self.attack_type,
-                        "intensity": self.intensity,
-                        "variant_id": 0,
-                    }
-                )
+                # 정상 텍스트는 변형하지 않고 같은 개수만큼 복사
+                for variant_id in range(1, num_variants + 1):
+                    rows.append(
+                        {
+                            "text": original_text,
+                            "label": label,
+                            "source": source,
+                            "original_text": original_text,
+                            "attack_type": self.attack_type,
+                            "intensity": self.intensity,
+                            "variant_id": variant_id,
+                        }
+                    )
 
         return pd.DataFrame(
             rows,

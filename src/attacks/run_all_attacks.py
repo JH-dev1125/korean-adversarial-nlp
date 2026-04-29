@@ -9,14 +9,13 @@ src/attacks/run_all_attacks.py
 실행 명령:
     python src/attacks/run_all_attacks.py
 
-반복 변형 개수 변경:
+반복 개수 변경:
     NUM_VARIANTS 값을 바꾸면 된다.
-    예: 5이면 label=1인 각 원문마다 같은 공격/강도에 대해 5개 변형 생성.
+    예: 5이면 label=1은 5개 변형, label=0은 원문 그대로 5개 복사.
 """
 
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 
@@ -34,7 +33,7 @@ INPUT_PATH = PROJECT_ROOT / "data" / "processed" / "test.csv"
 OUTPUT_DIR = PROJECT_ROOT / "data" / "augmented"
 
 INTENSITIES = [0.1, 0.2, 0.3]
-NUM_VARIANTS = 5  # 같은 원문에 대해 생성할 변형 개수
+NUM_VARIANTS = 5  # 각 원문에 대해 생성/복사할 개수
 RANDOM_SEED = 42
 
 
@@ -53,7 +52,7 @@ def main() -> None:
     print("=" * 60)
     print("공격 데이터 생성 시작")
     print(f"입력 파일: {INPUT_PATH}")
-    print(f"반복 변형 개수: label=1 행마다 {NUM_VARIANTS}개")
+    print(f"반복 개수: 모든 행마다 {NUM_VARIANTS}개(label=1 변형, label=0 복사)")
     print("=" * 60)
 
     for attack_cls in attack_classes:
@@ -68,7 +67,8 @@ def main() -> None:
             print(
                 f"저장 완료: {output_path} | "
                 f"총 {len(attacked_df)}행 | "
-                f"혐오 변형 행 {(attacked_df['label'] == 1).sum()}개"
+                f"label=1 행 {(attacked_df['label'] == 1).sum()}개 | "
+                f"label=0 행 {(attacked_df['label'] == 0).sum()}개"
             )
 
     print("=" * 60)
