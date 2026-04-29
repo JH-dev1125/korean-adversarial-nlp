@@ -1,0 +1,134 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "kold",
+  "dataset_size": 20727510,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/nayohan/KOLD@2e7aa9d2e202db21eb15c3ab10baff60cf7b8a98/data/train-00000-of-00001.parquet": {
+      "num_bytes": 8176787,
+      "checksum": null
+    }
+  },
+  "download_size": 8176787,
+  "features": {
+    "guid": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "source": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "date": {
+      "dtype": "timestamp[ns]",
+      "_type": "Value"
+    },
+    "title": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "comment": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "OFF": {
+      "dtype": "bool",
+      "_type": "Value"
+    },
+    "TGT": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "GRP": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "OFF_span": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "TGT_span": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "raw_labels": [
+      {
+        "annotator_id": {
+          "dtype": "int64",
+          "_type": "Value"
+        },
+        "off_end_idx": {
+          "feature": {
+            "dtype": "int64",
+            "_type": "Value"
+          },
+          "_type": "Sequence"
+        },
+        "off_start_idx": {
+          "feature": {
+            "dtype": "int64",
+            "_type": "Value"
+          },
+          "_type": "Sequence"
+        },
+        "offensiveness": {
+          "dtype": "bool",
+          "_type": "Value"
+        },
+        "target": {
+          "feature": {
+            "feature": {
+              "dtype": "string",
+              "_type": "Value"
+            },
+            "_type": "Sequence"
+          },
+          "_type": "Sequence"
+        },
+        "target_group": {
+          "feature": {
+            "feature": {
+              "dtype": "string",
+              "_type": "Value"
+            },
+            "_type": "Sequence"
+          },
+          "_type": "Sequence"
+        },
+        "tgt_end_idx": {
+          "feature": {
+            "dtype": "int64",
+            "_type": "Value"
+          },
+          "_type": "Sequence"
+        },
+        "tgt_start_idx": {
+          "feature": {
+            "dtype": "int64",
+            "_type": "Value"
+          },
+          "_type": "Sequence"
+        }
+      }
+    ]
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 28904297,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 20727510,
+      "num_examples": 40429,
+      "dataset_name": "kold"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

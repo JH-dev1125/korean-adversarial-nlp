@@ -1,0 +1,89 @@
+{
+  "builder_name": "json",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "k-haters",
+  "dataset_size": 42074000,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/humane-lab/K-HATERS@67b979254f2f5874f3c0f649e0db8ab33d038e0d/train.jsonl": {
+      "num_bytes": 47417162,
+      "checksum": null
+    },
+    "hf://datasets/humane-lab/K-HATERS@67b979254f2f5874f3c0f649e0db8ab33d038e0d/val.jsonl": {
+      "num_bytes": 2750872,
+      "checksum": null
+    },
+    "hf://datasets/humane-lab/K-HATERS@67b979254f2f5874f3c0f649e0db8ab33d038e0d/test.jsonl": {
+      "num_bytes": 2768958,
+      "checksum": null
+    }
+  },
+  "download_size": 52936992,
+  "features": {
+    "text": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "label": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "target_label": {
+      "feature": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "offensiveness_rationale": {
+      "feature": {
+        "feature": {
+          "dtype": "int64",
+          "_type": "Value"
+        },
+        "_type": "Sequence"
+      },
+      "_type": "Sequence"
+    },
+    "target_rationale": {
+      "feature": {
+        "feature": {
+          "dtype": "int64",
+          "_type": "Value"
+        },
+        "_type": "Sequence"
+      },
+      "_type": "Sequence"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 95010992,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 37684101,
+      "num_examples": 172158,
+      "dataset_name": "k-haters"
+    },
+    "validation": {
+      "name": "validation",
+      "num_bytes": 2185655,
+      "num_examples": 10000,
+      "dataset_name": "k-haters"
+    },
+    "test": {
+      "name": "test",
+      "num_bytes": 2204244,
+      "num_examples": 10000,
+      "dataset_name": "k-haters"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}
