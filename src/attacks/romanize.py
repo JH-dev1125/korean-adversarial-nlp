@@ -42,12 +42,12 @@ class RomanizeAttack(BaseAttack):
         return is_hangul_syllable(ch)
 
     def _romanize_syllable(self, ch: str) -> str:
-        cho, jung, jong = decompose_syllable(ch)
+        cho, jung, jong = decompose_syllable(ch) #초성 + 중성 + 종성으로 쪼개서 저장
         return self.CHO_ROMA[cho] + self.JUNG_ROMA[jung] + self.JONG_ROMA[jong]
 
     def attack_text(self, text: str) -> str:
         chars = list(str(text))
-        positions = [i for i, ch in enumerate(chars) if self._is_replaceable(ch)]
+        positions = [i for i, ch in enumerate(chars) if self._is_replaceable(ch)] #한글인 문자만 인덱싱 해서 저장
         selected = self._sample_positions(positions)
 
         for i in selected:
