@@ -27,10 +27,10 @@ CHO_INDEX = {j: i for i, j in enumerate(CHOSEONG)}
 JUNG_INDEX = {j: i for i, j in enumerate(JUNGSEONG)}
 JONG_INDEX = {j: i for i, j in enumerate(JONGSEONG)}
 
-HANGUL_BASE = 0xAC00
-HANGUL_END = 0xD7A3
-N_JUNG = 21
-N_JONG = 28
+HANGUL_BASE = 0xAC00 #'가'의 유니코드
+HANGUL_END = 0xD7A3 #'힣'의 유니코드
+N_JUNG = 21 #중성의 개수
+N_JONG = 28 #종성의 개수
 
 
 def is_hangul_syllable(ch: str) -> bool:
