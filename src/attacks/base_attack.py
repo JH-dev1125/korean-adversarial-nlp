@@ -17,7 +17,7 @@ import math #올림함수 ceil()등 불러오기 위함
 import random #변형 위치 고를 때 필요함
 from typing import List, Sequence #타입 힌트를 위해 List와 Sequence가져옴
 
-import pandas as pd #표 형태를 다루는 라이브러리, pd.DataFrame만들기 위해 불러옴
+import pandas as pd #표 형태를 다루는 라이브러리, pd.DataFrame 만들기 위해 불러옴
 
 
 class BaseAttack:
