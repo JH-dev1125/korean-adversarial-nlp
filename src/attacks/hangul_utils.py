@@ -32,22 +32,22 @@ HANGUL_END = 0xD7A3 #'힣'의 유니코드
 N_JUNG = 21 #중성의 개수
 N_JONG = 28 #종성의 개수
 
-
+#음절(길이가 1) and 한글인지 확인
 def is_hangul_syllable(ch: str) -> bool:
     return len(ch) == 1 and HANGUL_BASE <= ord(ch) <= HANGUL_END
 
-
+#한글을 초성 + 중성 + 종성으로 분해 , 튜플 return
 def decompose_syllable(ch: str) -> tuple[str, str, str]:
     if not is_hangul_syllable(ch):
         raise ValueError(f"한글 완성형 음절이 아닙니다: {ch}")
-
+    
     code = ord(ch) - HANGUL_BASE
     cho = code // (N_JUNG * N_JONG)
     jung = (code % (N_JUNG * N_JONG)) // N_JONG
     jong = code % N_JONG
     return CHOSEONG[cho], JUNGSEONG[jung], JONGSEONG[jong]
 
-
+#초성 + 중성 + 종성 합치기, 합쳐진 한글을 str로 반환
 def compose_syllable(cho: str, jung: str, jong: str = "") -> str:
     if cho not in CHO_INDEX:
         raise ValueError(f"올바르지 않은 초성입니다: {cho}")
