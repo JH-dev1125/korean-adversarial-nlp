@@ -28,7 +28,7 @@ JONG_CANDIDATES = ["ㄱ", "ㄴ", "ㄹ", "ㅁ", "ㅂ", "ㅅ", "ㅇ", "ㄷ", "ㅈ"
 class CodaManipAttack(BaseAttack):
     attack_type = "coda"
 
-    def _is_replaceable(self, ch: str) -> bool:
+    def _is_replaceable(self, ch: str) -> bool: #한글이면 변형 가능
         return is_hangul_syllable(ch)
 
     def _manipulate_coda(self, ch: str) -> str:
@@ -51,6 +51,6 @@ class CodaManipAttack(BaseAttack):
         selected = self._sample_positions(positions)
 
         for i in selected:
-            chars[i] = self._manipulate_coda(chars[i])
+            chars[i] = self._manipulate_coda(chars[i]) #선택된거 변형
 
         return "".join(chars)
