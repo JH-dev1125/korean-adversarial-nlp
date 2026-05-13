@@ -32,7 +32,7 @@ class JamoSplitAttack(BaseAttack):
 
     def attack_text(self, text: str) -> str:
         chars = list(str(text))
-        positions = [i for i, ch in enumerate(chars) if self._is_replaceable(ch)]
+        positions = [i for i, ch in enumerate(chars) if self._is_replaceable(ch)] #한글이면 공격 가능
         selected = self._sample_positions(positions)
 
         # 뒤에서부터 처리해야 인덱스 안 밀림
