@@ -24,7 +24,7 @@ from .hangul_utils import (
 class LiaisonAttack(BaseAttack):
     attack_type = "liaison"
 
-    def _apply_liaison(self, ch1: str, ch2: str) -> tuple[str, str] | None:
+    def _apply_liaison(self, ch1: str, ch2: str) -> tuple[str, str] | None: #연음 적용
         """
         ch1(받침 있는 음절) + ch2(ㅇ으로 시작하는 음절) 연음 처리
         받침을 다음 음절 초성으로 이동
@@ -32,10 +32,10 @@ class LiaisonAttack(BaseAttack):
         예: '먹' + '어' → '머' + '거'
         반환: 변환된 (ch1, ch2) 또는 변환 불가시 None
         """
-        if not (is_hangul_syllable(ch1) and is_hangul_syllable(ch2)):
+        if not (is_hangul_syllable(ch1) and is_hangul_syllable(ch2)): # 둘다 한글이여야됨
             return None
 
-        cho1, jung1, jong1 = decompose_syllable(ch1)
+        cho1, jung1, jong1 = decompose_syllable(ch1) #분해
         cho2, jung2, jong2 = decompose_syllable(ch2)
 
         # 받침 없거나, 다음 음절 초성이 ㅇ이 아니면 연음 안 일어남
