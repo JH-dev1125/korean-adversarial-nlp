@@ -79,9 +79,9 @@ class RomanizeAttack(BaseAttack):
         selected = self._sample_positions(positions)
 
         for i in selected:
-        if self.rng.random() < 0.5: #변형 비율 고르기 필요
-            chars[i] = self._romanize_syllable(chars[i])
-        else:
-            chars[i] = self._partial_romanize_syllable(chars[i])
+            if self.rng.random() < 0.5: #변형 비율 고르기 필요
+                chars[i] = self._romanize_syllable(chars[i])
+            else:
+                chars[i] = self._partial_romanize_syllable(chars[i])
 
         return "".join(chars)
