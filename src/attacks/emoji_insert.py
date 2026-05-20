@@ -14,10 +14,19 @@ from .hangul_utils import is_hangul_syllable
 
 # 삽입할 이모지/특수문자 후보 목록
 INSERT_CANDIDATES = [
-    "★", "☆", "♥", "♡", "■", "□", "●", "○",
-    "▶", "◀", "♠", "♣", "♦", "※", "▲", "▼",
-    "😊", "😂", "🤣", "👍", "🙏", "😍", "🔥", "💯",
-    "^", "*", "~", "!", "?", "#", "@", "%","1"
+    # 1순위: 키보드 기호 (가장 흔함)
+    ".", ",", "-", "_", "|", "/", "~", "^",
+    # 2순위: Shift+숫자 기호
+    "!", "@", "#", "$", "%", "*", "+", "=", "?",
+    # 3순위: 숫자
+    "0", "1", "2",
+    # 4순위: 한글 자판 특수문자
+    "※", "·",
+    # 5순위: 보이지 않는 문자 (실제 우회에서 많이 쓰임)
+    "\u200b",  # Zero-width space
+    "\u3164",  # 한글 채움 문자
+    # 6순위: 기존 특수기호 중 현실적인 것만 유지
+    "★", "♥", "▶",
 ]
 
 
@@ -39,12 +48,7 @@ class EmojiInsertAttack(BaseAttack):
         selected = self._sample_positions(positions)
 
         # 뒤에서부터 삽입 (인덱스 안 밀리게)
-        '''
-        attack = EmojiInsertAttack(intensity=0.2)  # 객체 생성
-        attack.attack_text("이 새끼가 진짜")        # 함수 호출
-        self = attack 객체 (intensity=0.2, rng등을 가지고 있음)
-        text = "이 새끼가 진짜"
-        '''
+        
         for i in sorted(selected, reverse=True):
             insert_char = self.rng.choice(INSERT_CANDIDATES)
             chars.insert(i + 1, insert_char)
