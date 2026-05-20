@@ -151,7 +151,7 @@ def train_model(model_key: str):
         learning_rate=LEARNING_RATE,
         warmup_ratio=0.1,
         weight_decay=0.01,
-        evaluation_strategy="epoch",  # 매 에포크마다 검증
+        eval_strategy="epoch",  # 매 에포크마다 검증
         save_strategy="epoch",
         load_best_model_at_end=True,  # 가장 좋은 모델 자동 선택
         metric_for_best_model="f1",
