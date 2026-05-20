@@ -29,11 +29,31 @@ class PhonemeSubAttack(BaseAttack):
         "ㅜ": ["ㅠ"], "ㅠ": ["ㅜ"],
     }
 
+    JONG_SUB = {
+    # 종성 ㄱ 계열: [ㄱ]으로 발음될 수 있음
+    "ㄱ": ["ㅋ", "ㄲ"],
+    "ㅋ": ["ㄱ", "ㄲ"],
+    "ㄲ": ["ㄱ", "ㅋ"],
+
+    # 종성 ㄷ 계열: [ㄷ]으로 발음될 수 있음
+    "ㄷ": ["ㅌ", "ㅅ", "ㅆ", "ㅈ", "ㅊ", "ㅎ"],
+    "ㅌ": ["ㄷ", "ㅅ", "ㅆ", "ㅈ", "ㅊ", "ㅎ"],
+    "ㅅ": ["ㄷ", "ㅌ", "ㅆ", "ㅈ", "ㅊ", "ㅎ"],
+    "ㅆ": ["ㄷ", "ㅌ", "ㅅ", "ㅈ", "ㅊ", "ㅎ"],
+    "ㅈ": ["ㄷ", "ㅌ", "ㅅ", "ㅆ", "ㅊ", "ㅎ"],
+    "ㅊ": ["ㄷ", "ㅌ", "ㅅ", "ㅆ", "ㅈ", "ㅎ"],
+    "ㅎ": ["ㄷ", "ㅌ", "ㅅ", "ㅆ", "ㅈ", "ㅊ"],
+
+    # 종성 ㅂ 계열: [ㅂ]으로 발음될 수 있음
+    "ㅂ": ["ㅍ"],
+    "ㅍ": ["ㅂ"],
+    }
+
     def _is_replaceable(self, ch: str) -> bool: #변형 가능 모음이나 자음 있으면 공격 가능
         if not is_hangul_syllable(ch):
             return False
-        cho, jung, _ = decompose_syllable(ch)
-        return cho in self.CHO_SUB or jung in self.JUNG_SUB
+        cho, jung, jong = decompose_syllable(ch)
+        return cho in self.CHO_SUB or jung in self.JUNG_SUB or jong in self.JONG_SUB
 
     def _replace_syllable(self, ch: str) -> str:
         cho, jung, jong = decompose_syllable(ch)
@@ -45,6 +65,9 @@ class PhonemeSubAttack(BaseAttack):
         if jung in self.JUNG_SUB: #초성이랑 똑같이 진행
             for new_jung in self.JUNG_SUB[jung]:
                 candidates.append(compose_syllable(cho, new_jung, jong))
+        if jong in self.JONG_SUB: #종성이랑 똑같이 진행
+            for new_jong in self.JONG_SUB[jong]:
+                candidates.append(compose_syllable(cho, jung, new_jong))
 
         if not candidates:
             return ch #바꿀거 없으면 그대로
