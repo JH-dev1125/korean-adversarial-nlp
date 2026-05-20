@@ -20,6 +20,22 @@ from .hangul_utils import (
     is_hangul_syllable,
 )
 
+SINGLE_JONGS = [ "ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄹ", "ㅁ", "ㅂ",
+    "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"
+]
+CLUSTER_JONGS = {
+    "ㄳ": ("ㄱ", "ㅅ"),
+    "ㄵ": ("ㄴ", "ㅈ"),
+    "ㄶ": ("ㄴ", "ㅎ"),
+    "ㄺ": ("ㄹ", "ㄱ"),
+    "ㄻ": ("ㄹ", "ㅁ"),
+    "ㄼ": ("ㄹ", "ㅂ"),
+    "ㄽ": ("ㄹ", "ㅅ"),
+    "ㄾ": ("ㄹ", "ㅌ"),
+    "ㄿ": ("ㄹ", "ㅍ"),
+    "ㅀ": ("ㄹ", "ㅎ"),
+    "ㅄ": ("ㅂ", "ㅅ"),
+}
 
 class LiaisonAttack(BaseAttack):
     attack_type = "liaison"
@@ -43,15 +59,22 @@ class LiaisonAttack(BaseAttack):
             return None
 
         # 연음: 받침을 다음 음절 초성으로
-        # jong1이 단자음인지 확인 (복합 받침은 처리 복잡해서 제외)
-        single_jongs = ["ㄱ", "ㄴ", "ㄷ", "ㄹ", "ㅁ", "ㅂ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"]
-        if jong1 not in single_jongs:
-            return None
+        # 단자음 받침 처리
+        
+        if jong1 not in SINGLE_JONGS:
+            new_ch1 = compose_syllable(cho1, jung1, "")       # 받침 제거
+            new_ch2 = compose_syllable(jong1, jung2, jong2)   # 받침을 초성으로
 
-        new_ch1 = compose_syllable(cho1, jung1, "")       # 받침 제거
-        new_ch2 = compose_syllable(jong1, jung2, jong2)   # 받침을 초성으로
-
-        return new_ch1, new_ch2
+            return new_ch1, new_ch2
+        
+        if jong1 in CLUSTER_JONGS:
+            remain_jong, new_cho = CLUSTER_JONGS[jong1]
+            # 앞 자음은 받침으로 유지 , 뒤 자음은 다음 음절 초성으로 보냄.
+            new_ch1 = compose_syllable(cho1,jung1,remain_jong)
+            new_ch2 = compose_syllable(new_cho,jung2,jong2)
+            return new_ch1, new_ch2
+        
+        return None
 
     def attack_text(self, text: str) -> str:
         chars = list(str(text))
