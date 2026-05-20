@@ -9,6 +9,7 @@ from .coda_manip import CodaManipAttack
 from .liaison import LiaisonAttack
 from .spacing import SpacingAttack
 from .emoji_insert import EmojiInsertAttack
+from .korean_to_english_typing import KoreanToEngTypingAttack
 
 __all__ = [
     "BaseAttack",
@@ -20,4 +21,5 @@ __all__ = [
     "LiaisonAttack",
     "SpacingAttack",
     "EmojiInsertAttack",
+    "KoreanToEngTypingAttack",
 ]

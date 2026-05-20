@@ -1,29 +1,22 @@
 """
 src/attacks/run_all_attacks.py
 
-9가지 공격을 강도별로 실행해 data/augmented/에 저장한다.
+10가지 공격을 강도별로 실행해 data/augmented/에 저장한다.
 
 실행 위치:
     프로젝트 최상위 폴더
 
 실행 명령:
     python src/attacks/run_all_attacks.py
-
-반복 변형 개수 변경:
-    NUM_VARIANTS 값을 바꾸면 된다.
-    예: 5이면 label=1인 각 원문마다 같은 공격/강도에 대해 5개 변형 생성.
-    label=0인 정상 텍스트도 NUM_VARIANTS개 복사해서 개수 균형 맞춤.
 """
 
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 
 import pandas as pd
 
-# 프로젝트 루트를 import path에 추가
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(PROJECT_ROOT))
 
@@ -35,12 +28,13 @@ from src.attacks.coda_manip import CodaManipAttack
 from src.attacks.liaison import LiaisonAttack
 from src.attacks.spacing import SpacingAttack
 from src.attacks.emoji_insert import EmojiInsertAttack
+from src.attacks.korean_to_english_typing import KoreanToEngTypingAttack
 
 INPUT_PATH = PROJECT_ROOT / "data" / "processed" / "test.csv"
 OUTPUT_DIR = PROJECT_ROOT / "data" / "augmented"
 
 INTENSITIES = [0.1, 0.2, 0.3]
-NUM_VARIANTS = 5  # 혐오/정상 모두 동일하게 5개 생성 (개수 균형)
+NUM_VARIANTS = 5
 RANDOM_SEED = 42
 
 
@@ -54,16 +48,17 @@ def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     df = pd.read_csv(INPUT_PATH)
 
-    # 9가지 공격 클래스 목록
+    # 10가지 공격 클래스 목록 (복합 공격 제외)
     attack_classes = [
-        PhonemeSubAttack,   # 음소 치환
-        VisualSubAttack,    # 시각적 유사 문자
-        RomanizeAttack,     # 로마자 혼용
-        JamoSplitAttack,    # 자모 분리
-        CodaManipAttack,    # 받침 탈락/삽입
-        LiaisonAttack,      # 연음 역이용
-        SpacingAttack,      # 띄어쓰기 조작
-        EmojiInsertAttack,  # 이모지/특수문자 삽입
+        PhonemeSubAttack,           # 음소 치환
+        VisualSubAttack,            # 시각적 유사 문자
+        RomanizeAttack,             # 로마자 혼용
+        JamoSplitAttack,            # 자모 분리
+        CodaManipAttack,            # 받침 탈락/삽입
+        LiaisonAttack,              # 연음 역이용
+        SpacingAttack,              # 띄어쓰기 조작
+        EmojiInsertAttack,          # 이모지/특수문자 삽입
+        KoreanToEngTypingAttack,    # 영타 변환
     ]
 
     print("=" * 60)
