@@ -61,7 +61,7 @@ class LiaisonAttack(BaseAttack):
         # 연음: 받침을 다음 음절 초성으로
         # 단자음 받침 처리
         
-        if jong1 not in SINGLE_JONGS:
+        if jong1 in SINGLE_JONGS:
             new_ch1 = compose_syllable(cho1, jung1, "")       # 받침 제거
             new_ch2 = compose_syllable(jong1, jung2, jong2)   # 받침을 초성으로
 
