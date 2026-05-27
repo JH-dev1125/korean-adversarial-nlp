@@ -63,35 +63,42 @@ SEED = 42
 # ====================================================
 # 데이터셋 클래스
 # ====================================================
+
 class HateSpeechDataset(Dataset):
     """
     파이토치 데이터셋 클래스.
     CSV 파일을 읽어서 모델이 학습할 수 있는 형태로 변환.
     """
+    """
+    PyTorch Dataset 클래스는 유지하되,
+    tokenizer를 __getitem__에서 매번 호출하지 않고
+    __init__에서 전체 데이터를 한 번에 토큰화하는 방식.
+    """
     def __init__(self, df, tokenizer, max_length=128):
-        self.texts = df["text"].tolist()
-        self.labels = df["label"].tolist()
-        self.tokenizer = tokenizer
-        self.max_length = max_length
+        self.labels = torch.tensor(
+            df["label"].tolist(),
+            dtype=torch.long
+        )
+
+        texts = df["text"].astype(str).tolist()
+
+        self.encodings = tokenizer(
+            texts,
+            max_length=max_length,
+            padding="max_length",
+            truncation=True,
+            return_tensors="pt",
+        )
 
     def __len__(self):
-        return len(self.texts)
+        return len(self.labels)
 
     def __getitem__(self, idx):
-        # 텍스트를 토큰(숫자)으로 변환
-        encoding = self.tokenizer(
-            str(self.texts[idx]),
-            max_length=self.max_length,
-            padding="max_length",   # 짧으면 패딩으로 채움
-            truncation=True,        # 길면 잘라냄
-            return_tensors="pt",    # 파이토치 텐서로 반환
-        )
         return {
-            "input_ids":      encoding["input_ids"].squeeze(),
-            "attention_mask": encoding["attention_mask"].squeeze(),
-            "labels":         torch.tensor(self.labels[idx], dtype=torch.long),
+            "input_ids": self.encodings["input_ids"][idx],
+            "attention_mask": self.encodings["attention_mask"][idx],
+            "labels": self.labels[idx],
         }
-
 
 # ====================================================
 # 성능 지표 계산 함수
