@@ -191,7 +191,7 @@ def evaluate_model(model_key: str, trainer, tokenizer):
     Args:
         model_key: 모델 이름
         trainer: 학습된 Trainer 객체
-        tokenizer: 토크나이저
+        tokenizer: 토크나이저야야
     """
     print(f"\n{'='*60}")
     print(f"성능 평가 시작: {model_key}")
