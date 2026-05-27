@@ -76,6 +76,8 @@ def train_model(model_key: str):
         save_total_limit=1,
         report_to="none",
         fp16=torch.cuda.is_available(),
+        dataloader_num_workers=4,
+        dataloader_pin_memory=True,
     )
 
     trainer = Trainer(
