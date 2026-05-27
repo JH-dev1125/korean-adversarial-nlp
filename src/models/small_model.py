@@ -55,7 +55,8 @@ MODEL_MAP = {
 
 # ── 학습 설정 ─────────────────────────────────────────
 MAX_LENGTH = 128    # 입력 텍스트 최대 길이
-BATCH_SIZE = 32     # 한 번에 처리할 샘플 수
+TRAIN_BATCH_SIZE = 32
+EVAL_BATCH_SIZE = 128   # 한 번에 처리할 샘플 수
 EPOCHS = 5          # 학습 반복 횟수
 LEARNING_RATE = 2e-5  # 학습률
 SEED = 42
@@ -225,8 +226,8 @@ def train_model(model_key: str):
     training_args = TrainingArguments(
         output_dir=str(save_path),
         num_train_epochs=EPOCHS,
-        per_device_train_batch_size=BATCH_SIZE,
-        per_device_eval_batch_size=BATCH_SIZE,
+        per_device_train_batch_size=TRAIN_BATCH_SIZE,
+        per_device_eval_batch_size=EVAL_BATCH_SIZE,
         learning_rate=LEARNING_RATE,
         warmup_ratio=WARMUP_RATIO,
         weight_decay=WEIGHT_DECAY,
