@@ -210,8 +210,10 @@ def evaluate_model(model_key: str, trainer, tokenizer):
     test_df = pd.read_csv(DATA_DIR / "processed" / "test.csv")
     test_dataset = HateSpeechDataset(test_df, tokenizer, MAX_LENGTH)
     pred_output = trainer.predict(test_dataset)
-    preds = np.argmax(pred_output.predictions, axis=-1)
-    f1_original = f1_score(test_df["label"].tolist(), preds, average="macro")
+    original_preds = np.argmax(pred_output.predictions, axis=-1)
+    original_labels = test_df["label"].tolist()
+
+    f1_original = f1_score(original_labels, original_preds, average="macro")
 
     print(f"\n원본 테스트 F1: {f1_original:.4f}")
     results.append({
@@ -222,25 +224,56 @@ def evaluate_model(model_key: str, trainer, tokenizer):
         "delta_f1": 0.0,
     })
 
+    #label=0인 원본 예측 결과만 따로 저장
+    label0_mask = test_df["label"] == 0
+    label0_labels = test_df.loc[label0_mask, "label"].tolist()
+    label0_preds = original_preds[label0_mask.to_numpy()].tolist()
+
     # 2. 변형 데이터 평가
     augmented_dir = DATA_DIR / "augmented"
     for csv_file in sorted(augmented_dir.glob("test_*.csv")):
         aug_df = pd.read_csv(csv_file)
 
-        # label=1인 변형 데이터만 평가 (label=0은 복제본이라 제외)
-        # variant_id=1만 사용 (중복 제거)
-        aug_df = aug_df[aug_df["variant_id"] == 1].reset_index(drop=True)
 
-        aug_dataset = HateSpeechDataset(aug_df, tokenizer, MAX_LENGTH)
+        # variant_id=1만 사용 (중복 제거)
+        if "variant_id" in aug_df.columns:
+            if EVALUATE_ALL_VARIANTS:
+        # 모든 variant 평가
+                pass
+            else:
+        # variant_id=1만 평가
+                aug_df = aug_df[aug_df["variant_id"] == 1].reset_index(drop=True)
+
+        #중복 제거
+        aug_label1_df = aug_df[aug_df["label"] == 1].reset_index(drop=True)
+
+
+        aug_dataset = HateSpeechDataset(aug_label1_df, tokenizer, MAX_LENGTH)
         pred_output = trainer.predict(aug_dataset)
-        preds = np.argmax(pred_output.predictions, axis=-1)
-        f1_attacked = f1_score(aug_df["label"].tolist(), preds, average="macro")
+        label1_preds = np.argmax(pred_output.predictions, axis=-1).tolist()
+        label1_labels = aug_label1_df["label"].tolist()
+
+        # label=0 원본 결과 + label=1 공격 결과 결합
+        if EVALUATE_ALL_VARIANTS and "variant_id" in aug_label1_df.columns:
+            num_variants = aug_label1_df["variant_id"].nunique()
+        else:
+            num_variants = 1
+
+        combined_labels = label0_labels * num_variants + label1_labels
+        combined_preds = label0_preds * num_variants + label1_preds
+
+        f1_attacked = f1_score(
+            combined_labels,
+            combined_preds,
+            average="macro"
+        )
 
         # 파일명에서 공격 유형과 강도 추출
         # 예: test_jamo_0.1.csv → attack_type=jamo, intensity=0.1
         parts = csv_file.stem.split("_")  # test_jamo_0.1 → ['test', 'jamo', '0.1']
-        attack_type = parts[1]
-        intensity = float(parts[2])
+        attack_type = "_".join(parts[1:-1])
+        intensity = float(parts[-1])
+
         delta_f1 = f1_original - f1_attacked
 
         print(f"{attack_type} (강도 {intensity}): F1={f1_attacked:.4f}, ΔF1={delta_f1:.4f}")
@@ -251,6 +284,12 @@ def evaluate_model(model_key: str, trainer, tokenizer):
             "f1": f1_attacked,
             "delta_f1": delta_f1,
         })
+
+        #중간저장
+        partial_df = pd.DataFrame(results)
+        partial_path = METRICS_DIR / f"{model_key}_results_partial.csv"
+        partial_df.to_csv(partial_path, index=False, encoding="utf-8-sig")
+        print(f"중간 저장 완료: {partial_path}")
 
     # 결과 저장
     results_df = pd.DataFrame(results)
@@ -273,7 +312,16 @@ if __name__ == "__main__":
         choices=["klue-bert", "klue-roberta", "kcbert"],
         help="학습할 모델 선택"
     )
+
+    parser.add_argument(
+    "--all_variants",
+    action="store_true",
+    help="모든 variant_id 평가 여부"
+    )
+
     args = parser.parse_args()
+
+    EVALUATE_ALL_VARIANTS = args.all_variants
 
     # 학습
     trainer, tokenizer, model = train_model(args.model)
