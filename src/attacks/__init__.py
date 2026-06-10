@@ -10,6 +10,7 @@ from .liaison import LiaisonAttack
 from .spacing import SpacingAttack
 from .emoji_insert import EmojiInsertAttack
 from .korean_to_english_typing import KoreanToEngTypingAttack
+from .compound_attack import CompoundAttack
 
 __all__ = [
     "BaseAttack",
@@ -22,4 +23,5 @@ __all__ = [
     "SpacingAttack",
     "EmojiInsertAttack",
     "KoreanToEngTypingAttack",
+    "CompoundAttack",
 ]
