@@ -25,7 +25,11 @@ from datasets import load_from_disk
 from sklearn.model_selection import train_test_split
 
 # ── 경로 설정 ─────────────────────────────────────────
+# RAW_DIR은 check_*.py 스크립트가 Hugging Face에서 내려받아 저장한 원본 데이터 폴더이다.
+# 원본 데이터는 실험 재현성을 위해 직접 수정하지 않는다.
 RAW_DIR = "data/raw"
+
+# SAVE_DIR은 모델 학습이 바로 읽을 수 있도록 정제한 CSV를 저장하는 폴더이다.
 SAVE_DIR = "data/processed"
 os.makedirs(SAVE_DIR, exist_ok=True)
 
@@ -50,8 +54,10 @@ def process_khaters():
     """
     print("K-HATERS 전처리 중...")
 
+    # ds는 Hugging Face DatasetDict 형태이다. train/validation/test 같은 split을 포함할 수 있다.
     ds = load_from_disk(f"{RAW_DIR}/khaters")
 
+    # K-HATERS의 모든 split을 하나로 합친 뒤 우리가 다시 train/val/test로 나눈다.
     all_data = []
     for split in ds.keys():
         df = pd.DataFrame(ds[split])
@@ -68,6 +74,7 @@ def process_khaters():
     )
 
     # 필요한 컬럼만 선택 + source 추가
+    # 이후 전체 파이프라인은 text, label, source 세 컬럼만 사용한다.
     df = df[["text", "label"]].copy()
     df["source"] = "khaters"
 
@@ -94,6 +101,7 @@ def process_kold():
     """
     print("KOLD 전처리 중...")
 
+    # ds는 Hugging Face DatasetDict 형태이다.
     ds = load_from_disk(f"{RAW_DIR}/kold")
 
     # KOLD는 train split만 있음
@@ -104,6 +112,7 @@ def process_kold():
         df = df.rename(columns={"comment": "text"})
 
     # 라벨 변환: False=0, True=1
+    # OFF는 offensive 여부를 나타내는 boolean 컬럼이다.
     df["label"] = df["OFF"].apply(lambda x: 1 if x else 0)
 
     # 필요한 컬럼만 선택 + source 추가
@@ -141,6 +150,7 @@ def process_kmhas():
     """
     print("K-MHaS 전처리 중...")
 
+    # K-MHaS는 멀티라벨 데이터셋이므로 label 컬럼이 리스트 형태이다.
     ds = load_from_disk(f"{RAW_DIR}/kmhas")
 
     all_data = []
@@ -152,6 +162,15 @@ def process_kmhas():
     # 라벨 변환
     # label 컬럼이 리스트 형식: [0, 3, 7] 같은 형태
     def convert_label(label_list):
+        """
+        K-MHaS 멀티라벨을 이진 라벨로 변환한다.
+
+        label_list:
+            예: [0, 7]처럼 한 문장에 붙은 카테고리 번호 목록.
+            CSV/저장 방식에 따라 문자열 "[0, 7]"로 들어오는 경우도 처리한다.
+        반환값:
+            KMHAS_HATE_LABELS와 하나라도 겹치면 1, 아니면 0.
+        """
         # label_list가 문자열로 저장된 경우 변환
         if isinstance(label_list, str):
             label_list = eval(label_list)
@@ -190,6 +209,7 @@ def merge_and_split(khaters_df, kold_df, kmhas_df):
     print("\n세 데이터셋 통합 중...")
 
     # 합치기
+    # df는 세 데이터셋을 같은 컬럼 구조(text, label, source)로 맞춘 통합 데이터이다.
     df = pd.concat([khaters_df, kold_df, kmhas_df], ignore_index=True)
 
     # 섞기 (random_state=42: 항상 같은 방식으로 섞기)
@@ -200,6 +220,7 @@ def merge_and_split(khaters_df, kold_df, kmhas_df):
     print(f"  혐오(1): {(df['label']==1).sum()}")
 
     # 1차 분할: 학습(80%) vs 나머지(20%)
+    # train_df는 학습에 쓰는 80% 데이터이고, temp_df는 val/test로 다시 나눌 20% 데이터이다.
     train_df, temp_df = train_test_split(
         df,
         test_size=0.2,
@@ -208,6 +229,7 @@ def merge_and_split(khaters_df, kold_df, kmhas_df):
     )
 
     # 2차 분할: 검증(10%) vs 테스트(10%)
+    # temp_df를 반으로 나누어 전체 기준 검증 10%, 테스트 10%를 만든다.
     val_df, test_df = train_test_split(
         temp_df,
         test_size=0.5,
@@ -236,6 +258,7 @@ if __name__ == "__main__":
     print("=" * 50)
 
     # 각 데이터셋 전처리
+    # 각 함수는 text, label, source 컬럼을 가진 DataFrame을 반환한다.
     khaters_df = process_khaters()
     kold_df = process_kold()
     kmhas_df = process_kmhas()

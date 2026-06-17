@@ -14,9 +14,22 @@ from .hangul_utils import is_hangul_syllable
 
 
 class SpacingAttack(BaseAttack):
+    """한글 사이 공백을 추가하거나 기존 공백을 제거하는 공격."""
+
+    # 결과 CSV의 attack_type 컬럼에 저장되는 이름이다.
     attack_type = "spacing"
 
     def attack_text(self, text: str) -> str:
+        """
+        문장 내 공백 조작 가능 위치를 찾아 일부만 변형한다.
+
+        add_positions:
+            ("add", i) 형태. chars[i]와 chars[i+1] 사이에 공백을 넣을 수 있다는 뜻이다.
+        remove_positions:
+            ("remove", i) 형태. chars[i]가 기존 공백이라 제거할 수 있다는 뜻이다.
+        all_positions:
+            추가 후보와 제거 후보를 합친 전체 조작 후보 목록.
+        """
         chars = list(str(text))
 
         # 두 가지 조작 가능한 위치 찾기
@@ -37,11 +50,12 @@ class SpacingAttack(BaseAttack):
             return text
 
         # intensity만큼 선택
+        # _sample_positions는 정수 목록을 받으므로 all_positions 자체가 아니라 인덱스 목록을 넘긴다.
         indices = list(range(len(all_positions)))
         selected_indices = self._sample_positions(indices)
         selected = [all_positions[i] for i in selected_indices]
 
-        # 뒤에서부터 처리
+        # 뒤에서부터 처리해야 앞쪽 삽입/삭제 때문에 뒤쪽 인덱스가 밀리지 않는다.
         selected_sorted = sorted(selected, key=lambda x: x[1], reverse=True)
 
         for action, i in selected_sorted:

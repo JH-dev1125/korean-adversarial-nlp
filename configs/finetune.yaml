@@ -19,7 +19,8 @@ model:
 # ── 학습 설정 ────────────────────────────────────────
 training:
   batch_size: 32                # 한 번에 처리할 샘플 수 (클수록 GPU 메모리 많이 씀)
-  epochs: 5                     # 전체 데이터를 몇 번 반복 학습할지
+  eval_batch_size: 128          # 평가 시 배치 크기 (학습보다 크게 잡아도 됨)
+  epochs: 3                     # 전체 데이터를 몇 번 반복 학습할지
   learning_rate: 2e-5           # 학습률 (너무 크면 학습이 불안정, 너무 작으면 느림)
   warmup_ratio: 0.1             # 초반에 학습률을 서서히 올리는 비율
   weight_decay: 0.01            # 과적합(overfitting) 방지 설정
